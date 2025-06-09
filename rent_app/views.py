@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.models import User
 from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from .models import Profile
 
 def home(request):
@@ -36,9 +37,60 @@ def register(request):
 
             if user is not None:
                 login(request, user)
-                return redirect('home') 
+                return redirect('dashboard') 
             else:
                 messages.error(request, "Invalid credentials.")
                 return redirect('register')
 
     return render(request, 'register.html')
+
+def logout_view(request):
+    logout(request)
+    return redirect('register')
+
+def dashboard(request):
+    if request.user.is_authenticated:
+        if request.user.is_superuser:
+            return redirect('admin_dashboard')
+        elif request.user.profile.role == 'tenant':
+            return redirect('tenant_dashboard')
+        elif request.user.profile.role == 'landlord':
+            return redirect('landlord_dashboard')
+    else:
+        return redirect('register')  
+
+def admin_dashboard(request):
+    return render (request, 'dashboards/admin_dashboard.html')
+
+def tenant_dashboard(request):
+    return render (request, 'dashboards/tenant_dashboard.html')
+
+def landlord_dashboard(request):
+    return render (request, 'dashboards/landlord_dashboard.html')
+
+@login_required
+def submit_profile(request):
+    if request.method == "POST":
+        phone = request.POST['phone']
+        vehicle_number = request.POST.get('vehicle_number')
+        vehicle_type = request.POST.get('vehicle_type')
+        license_number = request.POST.get('license_number')
+        location = request.POST.get('location')
+        id_proof = request.FILES.get('id_proof')
+
+        profile, created = Profile.objects.update_or_create(
+            user=request.user,
+            defaults={
+                'phone': phone,
+                'location': location,
+                'vehicle_number': vehicle_number,
+                'vehicle_type': vehicle_type,
+                'license_number': license_number,
+                'id_proof': id_proof,
+                'status': 'Pending',
+            }
+        )
+        messages.success(request, "Profile submitted.")
+        return redirect('dashboard')
+
+    return render(request, 'profile.html')

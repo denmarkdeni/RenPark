@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    
+
+<h2>Submit Your Profile</h2>
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  <label>Phone:</label>
+  <input type="text" name="phone" required><br>
+
+  <label>Role:</label>
+  <select name="role" id="role" required disabled>
+    <option value="tenant" {% if user.profile.role == 'tenant' %} selected {% endif %}>Tenant</option>
+    <option value="landlord" {% if user.profile.role == 'landlord' %} selected {% endif %}>Landlord</option>
+  </select><br>
+
+  <div id="landlord-fields" style="display:none;">
+    <label>Location:</label>
+    <input type="text" name="location"><br>
+    <label>ID Proof:</label>
+    <input type="file" name="id_proof"><br>
+  </div>
+
+  <div id="tenant-fields" style="display:none;">
+    <label>Vehicle Number:</label>
+    <input type="text" name="vehicle_number"><br>
+    <label>Vehicle Type:</label>
+    <input type="text" name="vehicle_type"><br>
+    <label>License Number:</label>
+    <input type="text" name="license_number"><br>
+  </div>
+
+  <button type="submit">Submit Profile</button>
+</form>
+
+<script>
+  document.addEventListener('DOMContentLoaded',function(){
+    role = document.getElementById("role").value;
+    console.log(role);
+    document.getElementById("landlord-fields").style.display = (role === "landlord") ? "block" : "none";
+    document.getElementById("tenant-fields").style.display = (role === "tenant") ? "block" : "none";
+  });
+</script>
+
+
+{% endblock %}

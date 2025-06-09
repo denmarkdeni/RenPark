@@ -17,9 +17,22 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from rent_app import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
     path('register/', views.register, name='register'),
+    path('logout/', views.logout_view, name='logout'),
+
+    path('dashboard/', views.dashboard, name='dashboard'),
+    path('admin_dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    path('tenant_dashboard/', views.tenant_dashboard, name='tenant_dashboard'),
+    path('landlord_dashboard/', views.landlord_dashboard, name='landlord_dashboard'),
+
+    path('profile/', views.submit_profile, name='profile'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
