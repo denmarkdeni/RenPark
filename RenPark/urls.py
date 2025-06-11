@@ -28,8 +28,8 @@ urlpatterns = [
 
     path('dashboard/', views.dashboard, name='dashboard'),
     path('admin_dashboard/', views.admin_dashboard, name='admin_dashboard'),
-    path('tenant_dashboard/', views.tenant_dashboard, name='tenant_dashboard'),
-    path('landlord_dashboard/', views.landlord_dashboard, name='landlord_dashboard'),
+    path('renter_dashboard/', views.renter_dashboard, name='renter_dashboard'),
+    path('owner_dashboard/', views.owner_dashboard, name='owner_dashboard'),
 
     path('profile/', views.submit_profile, name='profile'),
 ]

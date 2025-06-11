@@ -3,8 +3,8 @@ from django.contrib.auth.models import User
 
 class Profile(models.Model):
     ROLE_CHOICES = (
-        ('Tenant', 'Tenant'),
-        ('Landlord', 'Landlord'),
+        ('renter', 'Renter'),
+        ('owner', 'Car Owner'),
     )
     STATUS_CHOICES = (
         ('Pending', 'Pending'),

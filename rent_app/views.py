@@ -52,21 +52,21 @@ def dashboard(request):
     if request.user.is_authenticated:
         if request.user.is_superuser:
             return redirect('admin_dashboard')
-        elif request.user.profile.role == 'tenant':
-            return redirect('tenant_dashboard')
-        elif request.user.profile.role == 'landlord':
-            return redirect('landlord_dashboard')
+        elif request.user.profile.role == 'renter':
+            return redirect('renter_dashboard')
+        elif request.user.profile.role == 'owner':
+            return redirect('owner_dashboard')
     else:
         return redirect('register')  
 
 def admin_dashboard(request):
     return render (request, 'dashboards/admin_dashboard.html')
 
-def tenant_dashboard(request):
-    return render (request, 'dashboards/tenant_dashboard.html')
+def renter_dashboard(request):
+    return render (request, 'dashboards/renter_dashboard.html')
 
-def landlord_dashboard(request):
-    return render (request, 'dashboards/landlord_dashboard.html')
+def owner_dashboard(request):
+    return render (request, 'dashboards/owner_dashboard.html')
 
 @login_required
 def submit_profile(request):
