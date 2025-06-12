@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title fw-semibold mb-4">Renter Profile Form</h5>
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">Phone Number</label>
+                            <input type="text" class="form-control" id="phone" name="phone" value="{{ profile.phone|default_if_none:'' }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="location" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="location" name="location" value="{{ profile.location|default_if_none:'' }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="picture" class="form-label">Profile Picture</label>
+                            <input type="file" class="form-control" id="picture" name="picture" accept="image/*">
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_proof" class="form-label">ID Proof</label>
+                            <input type="file" class="form-control" id="id_proof" name="id_proof" accept=".pdf,.jpg,.png" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="license" class="form-label">Driving License</label>
+                            <input type="file" class="form-control" id="license" name="license" accept=".pdf,.jpg,.png" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}

@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- Current Bookings Card -->
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title fw-semibold mb-4">Current Bookings</h5>
+        <div class="row">
+            {% for booking in current_bookings %}
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        {% if booking.car.picture %}
+                            <img src="{{ booking.car.picture.url }}" class="car-img" alt="{{ booking.car.model }}">
+                        {% else %}
+                            <img src="/static/images/default_car.jpg" class="car-img" alt="Default Car Image">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ booking.car.model }}</h5>
+                            <p class="card-text">
+                                <strong>Start Date:</strong> {{ booking.start_date }}<br>
+                                <strong>End Date:</strong> {{ booking.end_date }}<br>
+                                <strong>Total Amount:</strong> ₹{{ booking.total_amount }}<br>
+                                <strong>Status:</strong> {{ booking.status }}
+                            </p>
+                            {% if booking.status == 'Pending' %}
+                                <a href="{% url 'make_payment' booking.id %}" class="btn btn-success btn-sm me-2">Pay Now</a>
+                                <button class="btn btn-danger btn-sm cancel-booking" data-booking-id="{{ booking.id }}">Cancel</button>
+                            {% elif booking.status == 'Confirmed' %}
+                                <button class="btn btn-primary btn-sm close-booking" data-booking-id="{{ booking.id }}">Close Booking</button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <p>No current bookings found.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Booking History Card -->
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title fw-semibold mb-4">Booking History</h5>
+        <div class="row">
+            {% for booking in past_bookings %}
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        {% if booking.car.picture %}
+                            <img src="{{ booking.car.picture.url }}" class="car-img" alt="{{ booking.car.model }}">
+                        {% else %}
+                            <img src="/static/images/default_car.jpg" class="car-img" alt="Default Car Image">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ booking.car.model }}</h5>
+                            <p class="card-text">
+                                <strong>Start Date:</strong> {{ booking.start_date }}<br>
+                                <strong>End Date:</strong> {{ booking.end_date }}<br>
+                                <strong>Total Amount:</strong> ₹{{ booking.total_amount }}<br>
+                                <strong>Status:</strong> {{ booking.status }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <p>No past bookings found.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+   
+
+<!-- Confirmation Pop-up for Cancel -->
+<div id="cancel-confirm" class="modal fade" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Cancellation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to cancel this booking? This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a id="confirm-cancel" href="#" class="btn btn-danger">Confirm Cancel</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Pop-up for Close Booking -->
+<div id="close-confirm" class="modal fade" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Close Booking</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to close this booking? This will mark the booking as completed and make the car available again.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <a id="confirm-close" href="#" class="btn btn-primary">Confirm Close</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const cancelButtons = document.querySelectorAll('.cancel-booking');
+    const confirmCancelLink = document.getElementById('confirm-cancel');
+
+    // Cancel Booking Pop-up
+    cancelButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const bookingId = button.getAttribute('data-booking-id');
+            confirmCancelLink.href = `/renter/booking/cancel/${bookingId}/`;
+            const modal = new bootstrap.Modal(document.getElementById('cancel-confirm'));
+            modal.show();
+        });
+    });
+
+    // Close Booking Pop-up
+    const closeButtons = document.querySelectorAll('.close-booking');
+    const confirmCloseLink = document.getElementById('confirm-close');
+
+    closeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const bookingId = button.getAttribute('data-booking-id');
+            confirmCloseLink.href = `/renter/booking/close/${bookingId}/`;
+            const modal = new bootstrap.Modal(document.getElementById('close-confirm'));
+            modal.show();
+        });
+    });
+});
+</script>
+{% endblock %}

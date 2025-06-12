@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title fw-semibold mb-4">Browse Available Cars</h5>
+            <div class="row">
+                {% for car in cars %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card">
+                            {% if car.picture %}
+                                <img src="{{ car.picture.url }}" class="car-img" alt="{{ car.model }}">
+                            {% else %}
+                                <img src="/static/images/default_car.jpg" class="car-img" alt="Default Car Image">
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">{{ car.model }}</h5>
+                                <p class="card-text">
+                                    {{ car.description|default:"No description available." }}<br>
+                                    <strong>Rent Rate:</strong> ₹{{ car.rent_rate }}/day<br>
+                                    <strong>Location:</strong> {{ car.location }}
+                                </p>
+                                <a href="{% url 'book_car' car.id %}" class="btn btn-primary">Book Now</a>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="col-12">
+                        <p>No cars available at the moment.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+{% endblock %}

@@ -1,4 +1,4 @@
-👥 1. Tenant (Customer / Renter)
+👥 1. Renter
 
     Purpose: To rent a car from the platform.
 
@@ -12,13 +12,13 @@
 
             View booking history.
 
-            Make payments online.
+            Make payments online.(dummy)
 
             Upload ID proof (for verification).
 
             View invoices and receipts.
 
-👨‍💼 2. Landlord (Car Owner / Provider)
+👨‍💼 2. Car owner
 
     Purpose: To list their car(s) for rent and earn from rentals.
 
@@ -26,7 +26,7 @@
 
             Register/login as a landlord.
 
-            Add car details (model, plate number, rate, etc.).
+            Add car details (model, plate number, Rent rate, etc.).
 
             Upload documents (RC Book, insurance).
 
@@ -36,7 +36,7 @@
 
             Track earnings and payouts.
 
-🛡️ 3. Admin (System Controller)
+🛡️ 3. Admin
 
     Purpose: To manage the overall platform, verify users, and ensure smooth operations.
 
@@ -44,7 +44,7 @@
 
             Login to the admin dashboard.
 
-            Approve or reject landlord and tenant registrations.
+            Approve or reject owner and renter registrations.
 
             View all bookings and users.
 
@@ -53,6 +53,5 @@
             Handle payment/revenue tracking.
 
             Generate system reports.
-
 
 

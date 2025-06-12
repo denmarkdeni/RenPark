@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title fw-semibold mb-4">Book Car : {{ car.model }}</h5>
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            {% if car.picture %}
+                                <img src="{{ car.picture.url }}" class="car-img" alt="{{ car.model }}">
+                            {% else %}
+                                <img src="/static/images/default_car.jpg" class="car-img" alt="Default Car Image">
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="card-title">{{ car.model }}</h5>
+                            <p class="card-text">
+                                {{ car.description|default:"No description available." }}<br>
+                                <strong>Rent Rate:</strong> ₹{{ car.rent_rate }}/day<br>
+                                <strong>Location:</strong> {{ car.location }}
+                            </p>
+                            <form method="POST" id="book-car-form">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label for="start_date" class="form-label">Start Date</label>
+                                    <input type="date" class="form-control" id="start_date" name="start_date" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="end_date" class="form-label">End Date</label>
+                                    <input type="date" class="form-control" id="end_date" name="end_date" required>
+                                </div>
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#book-confirm">Confirm Booking</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Confirmation Pop-up for Booking -->
+<div id="book-confirm" class="modal fade" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Booking</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to book this car from <span id="start-date-display"></span> to <span id="end-date-display"></span>? You will need to pay ₹<span id="total-amount-display"></span>.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirm-book-submit">Confirm Booking</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('book-car-form');
+        const startDateInput = document.getElementById('start_date');
+        const endDateInput = document.getElementById('end_date');
+        const startDateDisplay = document.getElementById('start-date-display');
+        const endDateDisplay = document.getElementById('end-date-display');
+        const totalAmountDisplay = document.getElementById('total-amount-display');
+        const confirmButton = document.getElementById('confirm-book-submit');
+        const rentRate = {{ car.rent_rate }};
+    
+        document.querySelector('[data-bs-target="#book-confirm"]').addEventListener('click', () => {
+            const startDate = startDateInput.value;
+            const endDate = endDateInput.value;
+    
+            if (!startDate || !endDate) {
+                alert("Please select both start and end dates.");
+                return;
+            }
+    
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            const days = (end - start) / (1000 * 60 * 60 * 24);
+    
+            if (days <= 0) {
+                alert("End date must be after start date.");
+                return;
+            }
+    
+            startDateDisplay.textContent = startDate;
+            endDateDisplay.textContent = endDate;
+            totalAmountDisplay.textContent = (days * rentRate).toFixed(2);
+        });
+    
+        confirmButton.addEventListener('click', () => {
+            form.submit();
+        });
+    });
+</script>
+
+{% endblock %}

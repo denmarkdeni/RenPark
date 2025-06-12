@@ -31,7 +31,17 @@ urlpatterns = [
     path('renter_dashboard/', views.renter_dashboard, name='renter_dashboard'),
     path('owner_dashboard/', views.owner_dashboard, name='owner_dashboard'),
 
-    path('profile/', views.submit_profile, name='profile'),
+    path('renter/profile/', views.renter_profile, name='renter_profile'),
+    path('renter/cars/browse', views.browse_cars, name='browse_cars'),
+    path('renter/car/book/<int:car_id>/', views.book_car, name='book_car'),
+
+    path('renter/booking-history/', views.booking_history, name='booking_history'),
+    path('renter/booking/pay/<int:booking_id>/', views.make_payment, name='make_payment'),
+    path('renter/booking/cancel/<int:booking_id>/', views.cancel_booking, name='cancel_booking'),
+    path('renter/booking/close/<int:booking_id>/', views.close_booking, name='close_booking'),
+
+    path('owner/profile/', views.owner_profile, name='owner_profile'),
+    path('owner/car/register', views.car_register, name='car_register'),
 ]
 
 if settings.DEBUG:

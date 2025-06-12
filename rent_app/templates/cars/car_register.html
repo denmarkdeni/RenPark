@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title fw-semibold mb-4">Register Your Car</h5>
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="model" class="form-label">Car Model</label>
+                            <input type="text" class="form-control" id="model" name="model" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="plate_number" class="form-label">Plate Number</label>
+                            <input type="text" class="form-control" id="plate_number" name="plate_number" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="rent_rate" class="form-label">Rent Rate (per day)</label>
+                            <input type="number" step="0.01" class="form-control" id="rent_rate" name="rent_rate" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="location" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="location" name="location" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="picture" class="form-label">Car Picture</label>
+                            <input type="file" class="form-control" id="picture" name="picture" accept=".pdf,.jpg,.png" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="rc_book" class="form-label">RC Book</label>
+                            <input type="file" class="form-control" id="rc_book" name="rc_book" accept=".pdf,.jpg,.png" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="insurance" class="form-label">Insurance</label>
+                            <input type="file" class="form-control" id="insurance" name="insurance" accept=".pdf,.jpg,.png" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Register Car</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+   
+
+{% endblock %}
