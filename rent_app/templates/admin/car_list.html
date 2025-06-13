@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title fw-semibold mb-4">All Cars</h5>
+        <div class="table-responsive">
+            <table class="table mb-0 text-nowrap varient-table align-middle fs-3">
+                <thead>
+                    <tr>
+                        <th scope="col" class="px-0 text-muted">Car Model</th>
+                        <th scope="col" class="px-0 text-muted">Owner</th>
+                        <th scope="col" class="px-0 text-muted">Availability</th>
+                        <th scope="col" class="px-0 text-muted">Location</th>
+                    </tr>
+                </thead>
+                <tbody部分: <tbody>
+                    {% for car in cars %}
+                        <tr>
+                            <td class="px-0">
+                                <div class="d-flex align-items-center">
+                                    {% if car.picture %}
+                                        <img src="{{ car.picture }}" class="rounded-circle" width="120" alt="{{ car.model }}" />
+                                    {% else %}
+                                        <img src="/static/images/default_car.jpg" class="rounded-circle" width="40" alt="Default Car" />
+                                    {% endif %}
+                                    <div class="ms-3">
+                                        <h6 class="mb-0 fw-bolder">{{ car.model }}</h6>
+                                        <span class="text-muted">{{ car.plate_number }}</span>
+                                    </div>
+                                </td>
+                                <td class="px-0">{{ car.owner_name }}</td>
+                                <td class="px-0">
+                                    <span class="badge bg-{% if car.is_available %}success{% else %}danger{% endif %}-subtle text-{% if car.is_available %}success{% else %}danger{% endif %}">
+                                        {% if car.is_available %}Available{% else %}Not Available{% endif %}
+                                    </span>
+                                </td>
+                                <td class="px-0">{{ car.location }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="4" class="px-0 text-center text-muted">No cars found.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+ 
+{% endblock %}

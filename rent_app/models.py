@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError
 from datetime import date
+from decimal import Decimal
 
 # Existing Profile model (included for reference, not modified)
 class Profile(models.Model):
@@ -10,18 +11,13 @@ class Profile(models.Model):
         ('renter', 'Renter'),
         ('owner', 'Car Owner'),
     )
-    STATUS_CHOICES = (
-        ('Pending', 'Pending'),
-        ('Approved', 'Approved'),
-        ('Rejected', 'Rejected'),
-    )
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES)
     phone = models.CharField(max_length=15, blank=True, null=True)
     location = models.CharField(max_length=100, blank=True, null=True)
     picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Pending')
+    is_approved = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.user.username} - {self.role}"
@@ -130,12 +126,24 @@ class Payout(models.Model):
 
     owner = models.ForeignKey(Profile, on_delete=models.CASCADE, limit_choices_to={'role': 'owner'}, related_name='payouts')
     booking = models.ForeignKey(Booking, on_delete=models.CASCADE, related_name='payouts')
-    amount = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    platform_fee = models.DecimalField(max_digits=10, decimal_places=2,null=True, blank=True) 
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
+    payout_date = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Payout {self.amount} to {self.owner.user.username}"
+    
+class OwnerEarnings(models.Model):
+    owner = models.OneToOneField(Profile, on_delete=models.CASCADE, limit_choices_to={'role': 'owner'})
+    total_earnings = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
+    pending_earnings = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
+    platform_fees = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
+    last_updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Earnings for {self.owner.user.username} - Total: {self.total_earnings}"
 
 # ReportedIssue model for admin to handle issues
 class ReportedIssue(models.Model):
@@ -155,3 +163,13 @@ class ReportedIssue(models.Model):
 
     def __str__(self):
         return f"Issue by {self.reported_by.user.username} - {self.status}"
+    
+class Review(models.Model):
+    booking = models.OneToOneField(Booking, on_delete=models.CASCADE, related_name='review')
+    renter = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='reviews', limit_choices_to={'role': 'renter'})
+    rating = models.IntegerField(choices=[(i, str(i)) for i in range(1, 6)])  # 1 to 5 stars
+    comment = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Review by {self.renter.user.username} for Booking {self.booking.id}"

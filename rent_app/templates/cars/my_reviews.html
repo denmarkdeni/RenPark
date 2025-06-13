@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title fw-semibold mb-4">My Reviews</h5>
+            <div class="row">
+                {% for review in reviews %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card">
+                            {% if review.booking.car.picture %}
+                                <img src="{{ review.booking.car.picture.url }}" class="car-img" alt="{{ review.booking.car.model }}">
+                            {% else %}
+                                <img src="/static/images/default_car.jpg" class="car-img" alt="Default Car Image">
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">{{ review.booking.car.model }}</h5>
+                                <p class="card-text">
+                                    <strong>Rating:</strong> {{ review.rating }} Star{{ review.rating|add:"-1"|add:"1"|yesno:"s,," }}<br>
+                                    <strong>Comment:</strong> {{ review.comment|default:"No comment" }}<br>
+                                    <strong>Booking Dates:</strong> {{ review.booking.start_date }} to {{ review.booking.end_date }}<br>
+                                    <strong>Reviewed On:</strong> {{ review.created_at|date:"Y-m-d" }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="col-12">
+                        <p>No reviews submitted yet.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}

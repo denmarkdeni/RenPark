@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title fw-semibold mb-4">User Management</h5>
+        <div class="table-responsive">
+            <table class="table mb-0 text-nowrap varient-table align-middle fs-3">
+                <thead>
+                    <tr>
+                        <th scope="col" class="px-0 text-muted">Username</th>
+                        <th scope="col" class="px-0 text-muted">Role</th>
+                        <th scope="col" class="px-0 text-muted">Phone</th>
+                        <th scope="col" class="px-0 text-muted">Location</th>
+                        <th scope="col" class="px-0 text-muted">Status</th>
+                        <th scope="col" class="px-0 text-muted text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                        <tr>
+                            <td class="px-0">
+                                <div class="d-flex align-items-center">
+                                    <img src="{{ user.picture_url }}" class="rounded-circle" width="40" alt="user" />
+                                    <div class="ms-3">
+                                        <h6 class="mb-0 fw-bolder">{{ user.username }}</h6>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-0">{{ user.role }}</td>
+                            <td class="px-0">{{ user.phone|default:"N/A" }}</td>
+                            <td class="px-0">{{ user.location|default:"N/A" }}</td>
+                            <td class="px-0">
+                                {% if user.is_approved %}
+                                    <span class="badge bg-success-subtle text-success">Verified</span>
+                                {% else %}
+                                    <span class="badge bg-warning-subtle text-warning">Pending</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-0 text-end">
+                                {% if not user.is_approved and user.role != 'admin' %}
+                                    <a href="{% url 'approve_user' user.id %}" class="btn btn-sm btn-success me-2">Approve</a>
+                                {% endif %}
+                                {% if user.role != 'admin' %}
+                                    <a href="{% url 'remove_user' user.id %}" class="btn btn-sm btn-danger remove-user" data-user-id="{{ user.id }}">Remove</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" class="px-0 text-center text-muted">No users found.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+    
+
+<!-- Confirmation Pop-up for Remove User -->
+<div id="remove-confirm" class="modal fade" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Removal</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to remove this user? This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <a id="confirm-remove" href="#" class="btn btn-danger">Confirm Remove</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const removeButtons = document.querySelectorAll('.remove-user');
+    const confirmRemoveLink = document.getElementById('confirm-remove');
+
+    removeButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+            const userId = button.getAttribute('data-user-id');
+            confirmRemoveLink.href = `/admin/remove-user/${userId}/`;
+            const modal = new bootstrap.Modal(document.getElementById('remove-confirm'));
+            modal.show();
+        });
+    });
+});
+</script>
+{% endblock %}

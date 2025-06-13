@@ -21,12 +21,15 @@
                                 <strong>Start Date:</strong> {{ booking.start_date }}<br>
                                 <strong>End Date:</strong> {{ booking.end_date }}<br>
                                 <strong>Total Amount:</strong> ₹{{ booking.total_amount }}<br>
-                                <strong>Status:</strong> {{ booking.status }}
+                                <strong>Status:</strong> {{ booking.status }}<br>
                             </p>
                             {% if booking.status == 'Pending' %}
                                 <a href="{% url 'make_payment' booking.id %}" class="btn btn-success btn-sm me-2">Pay Now</a>
                                 <button class="btn btn-danger btn-sm cancel-booking" data-booking-id="{{ booking.id }}">Cancel</button>
                             {% elif booking.status == 'Confirmed' %}
+                                {% if booking.invoice.pdf_file %}
+                                    <a href="{{ booking.invoice.pdf_file.url }}" class="btn btn-success btn-sm" download>Download Invoice</a>
+                                {% endif %}
                                 <button class="btn btn-primary btn-sm close-booking" data-booking-id="{{ booking.id }}">Close Booking</button>
                             {% endif %}
                         </div>
@@ -60,7 +63,14 @@
                                 <strong>Start Date:</strong> {{ booking.start_date }}<br>
                                 <strong>End Date:</strong> {{ booking.end_date }}<br>
                                 <strong>Total Amount:</strong> ₹{{ booking.total_amount }}<br>
-                                <strong>Status:</strong> {{ booking.status }}
+                                <strong>Status:</strong> {{ booking.status }}<br>
+                                {% if booking.status == 'Completed' %}
+                                    {% if booking.invoice.pdf_file %}
+                                        <a href="{{ booking.invoice.pdf_file.url }}" class="btn btn-sm btn-info mt-2" download><i class="ti ti-download"></i>Report</a>
+                                    {% endif %}
+
+                                    <a href="{% url 'submit_review' booking.id  %}" class="btn btn-sm btn-primary mt-2"><i class="ti ti-notes"></i>Review</a>
+                                {% endif %}
                             </p>
                         </div>
                     </div>
