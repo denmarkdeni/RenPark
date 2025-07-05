@@ -36,6 +36,12 @@ urlpatterns = [
     path('admin1/approve-user/<int:profile_id>/', views.approve_user, name='approve_user'),
     path('admin1/remove-user/<int:profile_id>/', views.remove_user, name='remove_user'),
     path('admin1/cars/', views.car_list, name='car_list'),
+    path('admin1/car/<int:car_id>/', views.car_details, name='car_details'),
+    path('admin1/car/<int:car_id>/bookings/', views.car_bookings, name='car_bookings'),
+    path('admin1/booking/<int:booking_id>/', views.booking_details, name='booking_details'),
+    path('admin1/car/<int:car_id>/reports/', views.car_reports, name='car_reports'),
+    path('admin1/revenue/cars/', views.car_revenue, name='car_revenue'),
+    path('admin1/payments/owners/', views.owner_payments, name='owner_payments'),
 
     path('renter/profile/', views.renter_profile, name='renter_profile'),
     path('renter/cars/browse', views.browse_cars, name='browse_cars'),
@@ -53,6 +59,10 @@ urlpatterns = [
 
     path('owner/profile/', views.owner_profile, name='owner_profile'),
     path('owner/car/register', views.car_register, name='car_register'),
+    path('owner/cars/', views.my_cars, name='my_cars'),
+    path('owner/car/<int:car_id>/', views.car_details_owner, name='car_details_owner'),
+    path('owner/earnings/', views.my_earnings, name='my_earnings'),
+    path('owner/revenue/cars/', views.cars_revenue_owner, name='cars_revenue_owner'),
 ]
 
 if settings.DEBUG:

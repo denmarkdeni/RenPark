@@ -1,7 +1,10 @@
 $(function () {
-    // Revenue overview
-    var options_sales_overview = {
-        series: window.revenueSeries,
+    // Revenue graph
+    var options_revenue_graph = {
+        series: [{
+            name: 'Revenue',
+            data: window.monthlyRevenue
+        }],
         chart: {
             type: "bar",
             height: 275,
@@ -31,15 +34,20 @@ $(function () {
                 borderRadius: 5,
             },
         },
-        colors: ["var(--bs-primary)", "var(--bs-secondary)"],
+        colors: ["var(--bs-primary)"],
         dataLabels: {
             enabled: false,
         },
         yaxis: {
             show: true,
             min: 0,
-            max: 1000,  // Adjust based on your revenue range
+            max: 500000,  // Adjust based on your revenue range
             tickAmount: 5,
+            labels: {
+                formatter: function (value) {
+                    return '₹' + value;
+                }
+            }
         },
         stroke: {
             show: true,
@@ -49,7 +57,7 @@ $(function () {
         },
         xaxis: {
             type: "category",
-            categories: window.revenueCategories,
+            categories: window.months,
             axisBorder: {
                 show: false,
             },
@@ -59,17 +67,24 @@ $(function () {
         },
         tooltip: {
             theme: "dark",
+            enabled: true,
+            y: {
+                formatter: function (value) {
+                    return '₹' + value.toFixed(2);
+                }
+            },
+            x: {
+                show: true
+            }
         },
         legend: {
-            show: true,
-            position: 'top',
-            horizontalAlign: 'center',
+            show: false,
         },
     };
 
-    var chart_column_basic = new ApexCharts(
-        document.querySelector("#sales-overview"),
-        options_sales_overview
+    var chart_revenue = new ApexCharts(
+        document.querySelector("#revenue-graph"),
+        options_revenue_graph
     );
-    chart_column_basic.render();
+    chart_revenue.render();
 });

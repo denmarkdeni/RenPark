@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title fw-semibold mb-4">Bookings for Car ID: {{ car_id }}</h5>
+                <div class="table-responsive">
+                    <table class="table mb-0 text-nowrap varient-table align-middle fs-3">
+                        <thead>
+                            <tr>
+                                <th scope="col" class="px-0 text-muted">Renter</th>
+                                <th scope="col" class="px-0 text-muted">Start Date</th>
+                                <th scope="col" class="px-0 text-muted">End Date</th>
+                                <th scope="col" class="px-0 text-muted">Total Amount</th>
+                                <th scope="col" class="px-0 text-muted">Status</th>
+                                <th scope="col" class="px-0 text-muted">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for booking in bookings %}
+                                <tr>
+                                    <td class="px-0">{{ booking.renter.user.username }}</td>
+                                    <td class="px-0">{{ booking.start_date }}</td>
+                                    <td class="px-0">{{ booking.end_date }}</td>
+                                    <td class="px-0">₹{{ booking.total_amount }}</td>
+                                    <td class="px-0">
+                                        <span class="badge bg-{% if booking.status == 'Confirmed' %}primary{% elif booking.status == 'Completed' %}success{% elif booking.status == 'Cancelled' %}danger{% else %}warning{% endif %}-subtle text-{% if booking.status == 'Confirmed' %}primary{% elif booking.status == 'Completed' %}success{% elif booking.status == 'Cancelled' %}danger{% else %}warning{% endif %}">
+                                            {{ booking.status }}
+                                        </span>
+                                    </td>
+                                    <td class="px-0">
+                                        <a href="{% url 'booking_details' booking.id %}" class="btn btn-info btn-sm">Details</a>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="5" class="px-0 text-center text-muted">No bookings found.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+   
+{% endblock %}

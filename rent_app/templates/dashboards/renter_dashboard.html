@@ -1,7 +1,96 @@
 {% extends 'base.html' %}
 
 {% block content %}
-tenant<br>
-<a href="{% url 'logout' %}">logout</a><br>
-<a href="{% url 'renter_profile' %}">profile</a>
+
+        <div class="row">
+            <!-- Rent Spent Graph -->
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title fw-semibold mb-4">Rent Spent by Month</h5>
+                        <div id="rent-spent-graph" style="height: 275px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Spending on Cars -->
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title mb-0">Top Spending on Cars</h4>
+                    </div>
+                    <div class="comment-widgets scrollable mb-2 common-widget" style="height: 300px" data-simplebar="">
+                        {% for car in top_cars %}
+                            <div class="d-flex flex-row comment-row border-bottom p-3 gap-3">
+                                <div>
+                                    <span><i class="ti ti-car fs-4"></i></span>
+                                </div>
+                                <div class="comment-text w-100">
+                                    <h6 class="fw-medium">{{ car.car_model }}</h6>
+                                    <p class="mb-1 fs-2 text-muted">Spent: ₹{{ car.total_spent }}</p>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div class="d-flex flex-row comment-row p-3 gap-3">
+                                <div>
+                                    <span><i class="ti ti-info-circle fs-4"></i></span>
+                                </div>
+                                <div class="comment-text w-100">
+                                    <h6 class="fw-medium">No Data</h6>
+                                    <p class="mb-1 fs-2 text-muted">No spending data yet.</p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Car Rents -->
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title mb-0">Recent Car Rents</h4>
+                    </div>
+                    <div class="table-responsive ms-4">
+                        <table class="table mb-0 text-nowrap varient-table align-middle fs-3">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="px-0 text-muted">Car Model</th>
+                                    <th scope="col" class="px-0 text-muted">Start Date</th>
+                                    <th scope="col" class="px-0 text-muted">End Date</th>
+                                    <th scope="col" class="px-0 text-muted">Amount</th>
+                                    <th scope="col" class="px-0 text-muted">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for booking in recent_bookings %}
+                                    <tr>
+                                        <td class="px-0">{{ booking.car.model }}</td>
+                                        <td class="px-0">{{ booking.start_date }}</td>
+                                        <td class="px-0">{{ booking.end_date }}</td>
+                                        <td class="px-0">₹{{ booking.total_amount }}</td>
+                                        <td class="px-0">
+                                            <span class="badge bg-{% if booking.status == 'Confirmed' %}primary{% elif booking.status == 'Completed' %}success{% else %}danger{% endif %}-subtle text-{% if booking.status == 'Confirmed' %}primary{% elif booking.status == 'Completed' %}success{% else %}danger{% endif %}">
+                                                {{ booking.status }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="5" class="px-0 text-center text-muted">No recent rents.</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+
+<script>
+    // Pass rent spent data to renter_dashboard.js
+    window.monthlySpent = {{ monthly_spent|safe }};
+    window.months = {{ months|safe }};
+</script>
 {% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title fw-semibold mb-4">Car Details - {{ car.model }}</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        {% if car.picture %}
+                            <img src="{{ car.picture.url }}" class="car-img" alt="{{ car.model }}">
+                        {% else %}
+                            <img src="/static/images/default_car.jpg" class="car-img" alt="Default Car Image">
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Plate Number:</strong> {{ car.plate_number }}</p>
+                        <p><strong>Owner:</strong> {{ car.owner.user.username }}</p>
+                        <p><strong>Rent Rate:</strong> ₹{{ car.rent_rate }}/day</p>
+                        <p><strong>Location:</strong> {{ car.location }}</p>
+                        <p><strong>Availability:</strong> 
+                            <span class="badge bg-{% if car.is_available %}success{% else %}danger{% endif %}-subtle text-{% if car.is_available %}success{% else %}danger{% endif %}">
+                                {% if car.is_available %}Available{% else %}Not Available{% endif %}
+                            </span>
+                        </p>
+                        <p><strong>Created At:</strong> {{ car.created_at|date:"Y-m-d" }}</p>
+                        <h6>Documents:</h6>
+                        {% if documents %}
+                            <ul>
+                                {% for doc in documents %}
+                                    <li>{{ doc.document_type }} - {{ doc.status }} <a href="{{ doc.document_file.url }}" target="__blank__">(View file)</a> </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>No documents uploaded.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+{% endblock %}

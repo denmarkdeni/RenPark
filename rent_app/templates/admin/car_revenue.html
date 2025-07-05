@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title fw-semibold mb-4">Revenue by Cars</h5>
+                <div class="table-responsive">
+                    <table class="table mb-0 text-nowrap varient-table align-middle fs-3">
+                        <thead>
+                            <tr>
+                                <th scope="col" class="px-0 text-muted">Car Model</th>
+                                <th scope="col" class="px-0 text-muted">Owner</th>
+                                <th scope="col" class="px-0 text-muted">Total Revenue</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for car in cars %}
+                                <tr>
+                                    <td class="px-0">{{ car.model }}</td>
+                                    <td class="px-0">{{ car.owner.user.username }}</td>
+                                    <td class="px-0">₹{{ car.total_revenue|default:"0.00" }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="3" class="px-0 text-center text-muted">No revenue data available.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+   
+{% endblock %}

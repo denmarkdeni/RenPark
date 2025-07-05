@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title fw-semibold mb-4">Booking Details - #{{ booking.id }}</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        {% if booking.car.picture %}
+                            <img src="{{ booking.car.picture.url }}" class="car-img" alt="{{ booking.car.model }}">
+                        {% else %}
+                            <img src="/static/images/default_car.jpg" class="car-img" alt="Default Car Image">
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Car Model:</strong> {{ booking.car.model }}</p>
+                        <p><strong>Owner:</strong> {{ booking.car.owner.user.username }}</p>
+                        <p><strong>Renter:</strong> {{ booking.renter.user.username }}</p>
+                        <p><strong>Start Date:</strong> {{ booking.start_date }}</p>
+                        <p><strong>End Date:</strong> {{ booking.end_date }}</p>
+                        <p><strong>Total Amount:</strong> ₹{{ booking.total_amount }}</p>
+                        <p><strong>Status:</strong> 
+                            <span class="badge bg-{% if booking.status == 'Confirmed' %}primary{% elif booking.status == 'Completed' %}success{% elif booking.status == 'Cancelled' %}danger{% else %}warning{% endif %}-subtle text-{% if booking.status == 'Confirmed' %}primary{% elif booking.status == 'Completed' %}success{% elif booking.status == 'Cancelled' %}danger{% else %}warning{% endif %}">
+                                {{ booking.status }}
+                            </span>
+                        </p>
+                        {% if payment %}
+                            <p><strong>Payment Status:</strong> {{ payment.status }}</p>
+                            <p><strong>Transaction ID:</strong> {{ payment.transaction_id }}</p>
+                        {% endif %}
+                        {% if invoice %}
+                            <p><strong>Invoice Number:</strong> {{ invoice.invoice_number }}</p>
+                            {% if invoice.pdf_file %}
+                                <a href="{{ invoice.pdf_file.url }}" class="btn btn-sm btn-info mt-2" download>Download Invoice</a>
+                            {% endif %}
+                        {% endif %}
+                        {% if review %}
+                            <p><strong>Review Rating:</strong> {{ review.rating }} Stars</p>
+                            <p><strong>Review Comment:</strong> {{ review.comment|default:"No comment" }}</p>
+                        {% endif %}
+                        {% if issues %}
+                            <h6>Reported Issues:</h6>
+                            <ul>
+                                {% for issue in issues %}
+                                    <li>{{ issue.description }} - <span class="badge bg-{% if issue.status == 'Open' %}info{% elif issue.status == 'In Progress' %}warning{% else %}success{% endif %}-subtle text-{% if issue.status == 'Open' %}info{% elif issue.status == 'In Progress' %}warning{% else %}success{% endif %}">{{ issue.status }}</span></li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+   
+{% endblock %}

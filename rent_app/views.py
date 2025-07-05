@@ -3,11 +3,12 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.db.models import Count, Sum
+from django.db.models import Count, Sum, Q
 from django.utils import timezone
 from .models import Profile, RenterDocument, CarDocument, Car, Booking, Payment
 from .models import Payout, Invoice, OwnerEarnings, ReportedIssue, Review
-from datetime import datetime
+from datetime import datetime, date
+from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
@@ -191,20 +192,125 @@ def admin_dashboard(request):
         for issue in recent_issues
     ]
 
+    # Revenue data for the last 6 days
+    end_date = timezone.now().date()
+    start_date = end_date - timezone.timedelta(days=5)
+    categories = [(start_date + timezone.timedelta(days=i)).strftime('%a') for i in range(6)]
+    cars = Car.objects.all().annotate(total_revenue=Sum('bookings__total_amount', 
+                                                      filter=Q(bookings__status__in=['Confirmed', 'Completed'])))
+    series_data = []
+    for car in cars[:2]:  # Limit to top 2 cars (e.g., Ample Admin, Pixel Admin)
+        daily_revenue = []
+        for i in range(6):
+            day = start_date + timezone.timedelta(days=i)
+            revenue = Booking.objects.filter(
+                car=car, status__in=['Confirmed', 'Completed'], end_date=day
+            ).aggregate(total=Sum('total_amount'))['total'] or 0
+            daily_revenue.append(float(revenue))
+        series_data.append({'name': car.model, 'data': daily_revenue})
+    print(categories,series_data)
+
     return render(request, 'dashboards/admin_dashboard.html', {
         'top_cars': top_cars_data,
         'recent_cars': recent_cars_data,
         'month_options': month_options,
         'selected_month': selected_month,
         'feedback': feedback_data,
-        'issues': issues_data
+        'issues': issues_data,
+        'revenue_series': series_data,
+        'revenue_categories': categories
+    }) 
+
+@login_required
+def renter_dashboard(request):
+    if request.user.profile.role != 'renter':
+        messages.error(request, "Access denied. You are not a renter.")
+        return redirect('home')
+
+    profile = request.user.profile
+    # Rent spent by month for the last 6 months
+    end_date = timezone.now().date()
+    start_date = end_date - relativedelta(months=5)
+    months = [(start_date + relativedelta(months=i)).strftime('%B %Y') for i in range(6)]
+    monthly_spent = []
+    for i in range(6):
+        month_start = start_date + relativedelta(months=i)
+        month_end = month_start + relativedelta(months=1, days=-1)
+        spent = Booking.objects.filter(
+            renter=profile, status__in=['Confirmed', 'Completed'],
+            end_date__range=[month_start, month_end]
+        ).aggregate(total=Sum('total_amount'))['total'] or 0
+        monthly_spent.append(float(spent))
+
+    # Top spending on cars
+    top_cars = Booking.objects.filter(
+        renter=profile, status__in=['Confirmed', 'Completed']
+    ).values('car__model').annotate(total_spent=Sum('total_amount')).order_by('-total_spent')[:3]
+
+    top_cars_data = [
+        {'car_model': car['car__model'], 'total_spent': float(car['total_spent'] or 0)}
+        for car in top_cars
+    ]
+
+    # Recent car rents
+    recent_bookings = Booking.objects.filter(
+        renter=profile, status__in=['Confirmed', 'Completed']
+    ).order_by('-created_at')[:4]
+
+    return render(request, 'dashboards/renter_dashboard.html', {
+        'monthly_spent': monthly_spent,
+        'months': months,
+        'top_cars': top_cars_data,
+        'recent_bookings': recent_bookings
     })
 
-def renter_dashboard(request):
-    return render (request, 'dashboards/renter_dashboard.html')
-
+@login_required
 def owner_dashboard(request):
-    return render (request, 'dashboards/owner_dashboard.html')
+    if request.user.profile.role != 'owner':
+        messages.error(request, "Access denied. You are not a car owner.")
+        return redirect('home')
+
+    # Revenue by month for the last 6 months
+    end_date = date.today()
+    months = [(end_date - relativedelta(months=i)).strftime('%B %Y') for i in reversed(range(6))]  
+    profile = request.user.profile
+    monthly_revenue = []
+
+    for i in reversed(range(6)):
+        month_start = (end_date - relativedelta(months=i)).replace(day=1)
+        month_end = (month_start + relativedelta(months=1)) - relativedelta(days=1)
+
+        revenue = Booking.objects.filter(
+            car__owner=profile,
+            status__in=['Confirmed', 'Completed'],
+            end_date__range=[month_start, month_end]
+        ).aggregate(total=Sum('total_amount'))['total'] or 0
+
+        monthly_revenue.append(float(revenue))
+
+    # Top rented cars for the owner
+    top_cars = Car.objects.filter(owner=profile).annotate(
+        booking_count=Count('bookings', filter=Q(bookings__status__in=['Confirmed', 'Completed']))
+    ).order_by('-booking_count')[:3]
+
+    top_cars_data = [
+        {
+            'car_model': car.model,
+            'booking_count': car.booking_count,
+            'performance': f"+{car.booking_count * 5}%"  # Simple performance metric
+        }
+        for car in top_cars
+    ]
+
+    # Issues on cars
+    issues = ReportedIssue.objects.filter(car__owner=profile).order_by('-created_at')[:5]
+
+    return render(request, 'dashboards/owner_dashboard.html', {
+        'monthly_revenue': monthly_revenue,
+        'months': months,
+        'top_cars': top_cars_data,
+        'issues': issues
+    })
 
 @login_required
 def renter_profile(request):
@@ -626,6 +732,7 @@ def car_list(request):
     cars = Car.objects.all().select_related('owner')
     cars_data = [
         {
+            'id': car.id,
             'model': car.model,
             'plate_number': car.plate_number,
             'owner_name': car.owner.user.username,
@@ -637,3 +744,137 @@ def car_list(request):
     ]
 
     return render(request, 'admin/car_list.html', {'cars': cars_data})
+
+@login_required
+def car_details(request, car_id):
+    if not request.user.is_superuser:
+        messages.error(request, "Access denied. You are not an admin.")
+        return redirect('home')
+
+    car = get_object_or_404(Car, id=car_id)
+    documents = CarDocument.objects.filter(car=car)
+    return render(request, 'admin/car_details.html', {'car': car, 'documents': documents})
+
+@login_required
+def car_bookings(request, car_id):
+    if not request.user.is_superuser and not request.user.profile.role == 'owner':
+        messages.error(request, "Access denied. You are not an admin.")
+        return redirect('home')
+
+    bookings = Booking.objects.filter(car_id=car_id).order_by('-created_at')
+    return render(request, 'admin/car_bookings.html', {'bookings': bookings, 'car_id': car_id})
+
+@login_required
+def booking_details(request, booking_id):
+    if not request.user.is_superuser:
+        messages.error(request, "Access denied. You are not an admin.")
+        return redirect('home')
+
+    booking = get_object_or_404(Booking, id=booking_id)
+    payment = getattr(booking, 'payment', None)
+    invoice = getattr(booking, 'invoice', None)
+    review = getattr(booking, 'review', None)
+    issues = ReportedIssue.objects.filter(booking=booking)
+    return render(request, 'admin/booking_details.html', {
+        'booking': booking,
+        'payment': payment,
+        'invoice': invoice,
+        'review': review,
+        'issues': issues
+    })
+
+@login_required
+def car_reports(request, car_id):
+    if not request.user.is_superuser:
+        messages.error(request, "Access denied. You are not an admin.")
+        return redirect('home')
+
+    car = get_object_or_404(Car, id=car_id)
+    bookings = Booking.objects.filter(car=car).order_by('-created_at')
+    issues = ReportedIssue.objects.filter(car=car).order_by('-created_at')
+    total_revenue = sum(booking.total_amount for booking in bookings if booking.status in ['Confirmed', 'Completed'])
+    return render(request, 'admin/car_reports.html', {
+        'car': car,
+        'issues': issues,
+        'total_revenue': total_revenue
+    })
+
+@login_required
+def car_revenue(request):
+    if not request.user.is_superuser:
+        messages.error(request, "Access denied. You are not an admin.")
+        return redirect('home')
+
+    cars = Car.objects.all().annotate(total_revenue=Sum('bookings__total_amount', filter=Q(bookings__status__in=['Confirmed', 'Completed'])))
+    return render(request, 'admin/car_revenue.html', {'cars': cars})
+
+@login_required
+def owner_payments(request):
+    if not request.user.is_superuser:
+        messages.error(request, "Access denied. You are not an admin.")
+        return redirect('home')
+
+    owners = Profile.objects.filter(role='owner').annotate(total_payments=Sum('payouts__amount', filter=Q(payouts__status='Completed')))
+    return render(request, 'admin/owner_payments.html', {'owners': owners})
+
+@login_required
+def my_cars(request):
+    if request.user.profile.role != 'owner':
+        messages.error(request, "Access denied. You are not a car owner.")
+        return redirect('home')
+    
+    cars = Car.objects.filter(owner=request.user.profile).order_by('-created_at')
+    return render(request, 'car_owner/my_cars.html', {'cars': cars})
+
+@login_required
+def car_details_owner(request, car_id):
+    if request.user.profile.role != 'owner':
+        messages.error(request, "Access denied. You are not a car owner.")
+        return redirect('home')
+    
+    car = get_object_or_404(Car, id=car_id, owner=request.user.profile)
+    documents = CarDocument.objects.filter(car=car)
+    if request.method == 'POST':
+        car.model = request.POST.get('model')
+        car.plate_number = request.POST.get('plate_number')
+        car.rent_rate = request.POST.get('rent_rate')
+        car.description = request.POST.get('description')
+        car.location = request.POST.get('location')
+        picture = request.FILES.get('picture')
+        if picture:
+            if car.picture and os.path.exists(car.picture.path):
+                os.remove(car.picture.path)
+            car.picture = picture
+        car.save()
+        messages.success(request, "Car details updated successfully!")
+        return redirect('car_details_owner', car_id=car.id)
+    return render(request, 'car_owner/car_details_owner.html', {'car': car, 'documents': documents})
+
+@login_required
+def my_earnings(request):
+    if request.user.profile.role != 'owner':
+        messages.error(request, "Access denied. You are not a car owner.")
+        return redirect('home')
+    
+    profile = request.user.profile
+    total_earnings = OwnerEarnings.objects.get(owner=profile).total_earnings
+    pending_earnings = OwnerEarnings.objects.get(owner=profile).pending_earnings
+    platform_fees = OwnerEarnings.objects.get(owner=profile).platform_fees
+    payouts = Payout.objects.filter(owner=profile).order_by('-created_at')
+    return render(request, 'car_owner/my_earnings.html', {
+        'total_earnings': total_earnings,
+        'pending_earnings': pending_earnings,
+        'platform_fees': platform_fees,
+        'payouts': payouts
+    })
+
+@login_required
+def cars_revenue_owner(request):
+    if request.user.profile.role != 'owner':
+        messages.error(request, "Access denied. You are not a car owner.")
+        return redirect('home')
+    
+    cars = Car.objects.filter(owner=request.user.profile).annotate(
+        total_revenue=Sum('bookings__total_amount', filter=Q(bookings__status__in=['Confirmed', 'Completed']))
+    )
+    return render(request, 'car_owner/cars_revenue_owner.html', {'cars': cars})

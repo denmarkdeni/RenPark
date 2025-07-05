@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title fw-semibold mb-4">Reports for Car - {{ car.model }}</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        {% if car.picture %}
+                            <img src="{{ car.picture.url }}" class="car-img" alt="{{ car.model }}">
+                        {% else %}
+                            <img src="/static/images/default_car.jpg" class="car-img" alt="Default Car Image">
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Plate Number:</strong> {{ car.plate_number }}</p>
+                        <p><strong>Owner:</strong> {{ car.owner.user.username }}</p>
+                        <p><strong>Location:</strong> {{ car.location }}</p>
+                        <p><strong>Total Revenue:</strong> ₹{{ total_revenue }}</p>
+                    </div>
+                </div>
+                
+                <h6 class="mt-4">Reported Issues:</h6>
+                <div class="table-responsive">
+                    <table class="table mb-0 text-nowrap varient-table align-middle fs-3">
+                        <thead>
+                            <tr>
+                                <th scope="col" class="px-0 text-muted">Reported By</th>
+                                <th scope="col" class="px-0 text-muted">Description</th>
+                                <th scope="col" class="px-0 text-muted">Status</th>
+                                <th scope="col" class="px-0 text-muted">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for issue in issues %}
+                                <tr>
+                                    <td class="px-0">{{ issue.reported_by.user.username }}</td>
+                                    <td class="px-0">{{ issue.description }}</td>
+                                    <td class="px-0">
+                                        <span class="badge bg-{% if issue.status == 'Open' %}info{% elif issue.status == 'In Progress' %}warning{% else %}success{% endif %}-subtle text-{% if issue.status == 'Open' %}info{% elif issue.status == 'In Progress' %}warning{% else %}success{% endif %}">
+                                            {{ issue.status }}
+                                        </span>
+                                    </td>
+                                    <td class="px-0">{{ issue.created_at|date:"Y-m-d" }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="4" class="px-0 text-center text-muted">No issues reported.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    
+
+{% endblock %}

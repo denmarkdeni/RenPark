@@ -11,18 +11,18 @@
                 <div>
                   <h4 class="card-title">Revenue overview </h4>
                   <p class="card-subtitle">
-                    Car usage Vs Rents
-                  </p>
+                    Comparison between Top Rented Cars
+                  </p> 
                 </div>
                 <div class="ms-auto">
                   <ul class="list-unstyled mb-0">
                     <li class="list-inline-item text-primary">
                       <span class="round-8 text-bg-primary rounded-circle me-1 d-inline-block"></span>
-                      Usage
+                      Top 1
                     </li>
                     <li class="list-inline-item text-info">
                       <span class="round-8 text-bg-info rounded-circle me-1 d-inline-block"></span>
-                      Rents
+                      Top 2
                     </li>
                   </ul>
                 </div>
@@ -218,4 +218,9 @@
         </div>
     </div>
 
+   <script>
+        // Pass revenue data to dashboard.js
+        window.revenueSeries = {{ revenue_series|safe }};
+        window.revenueCategories = {{ revenue_categories|safe }};
+    </script>
 {% endblock %}

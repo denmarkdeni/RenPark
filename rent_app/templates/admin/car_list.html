@@ -13,6 +13,7 @@
                         <th scope="col" class="px-0 text-muted">Owner</th>
                         <th scope="col" class="px-0 text-muted">Availability</th>
                         <th scope="col" class="px-0 text-muted">Location</th>
+                        <th scope="col" class="px-0 text-muted">Actions</th>
                     </tr>
                 </thead>
                 <tbody部分: <tbody>
@@ -37,6 +38,11 @@
                                     </span>
                                 </td>
                                 <td class="px-0">{{ car.location }}</td>
+                                <td class="px-0">
+                                    <a href="{% url 'car_details' car.id %}" class="btn btn-primary btn-sm">Details</a>
+                                    <a href="{% url 'car_bookings' car.id %}" class="btn btn-secondary btn-sm">Bookings</a>
+                                    <a href="{% url 'car_reports' car.id %}" class="btn btn-warning btn-sm">Reports</a>
+                                </td>
                         </tr>
                     {% empty %}
                         <tr>

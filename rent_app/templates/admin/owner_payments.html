@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title fw-semibold mb-4">Payments by Owners</h5>
+                <div class="table-responsive">
+                    <table class="table mb-0 text-nowrap varient-table align-middle fs-3">
+                        <thead>
+                            <tr>
+                                <th scope="col" class="px-0 text-muted">Owner Name</th>
+                                <th scope="col" class="px-0 text-muted">Total Payments</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for owner in owners %}
+                                <tr>
+                                    <td class="px-0">{{ owner.user.username }}</td>
+                                    <td class="px-0">₹{{ owner.total_payments|default:"0.00" }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="2" class="px-0 text-center text-muted">No payment data available.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+   
+{% endblock %}

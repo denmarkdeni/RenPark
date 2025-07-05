@@ -1,7 +1,98 @@
 {% extends 'base.html' %}
 
 {% block content %}
-landlord<br>
-<a href="{% url 'logout' %}">logout</a><br>
-<a href="{% url 'owner_profile' %}">profile</a>
+
+        <div class="row">
+            <!-- Revenue Graph -->
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title fw-semibold mb-4">Revenue by Month</h5>
+                        <div id="revenue-graph" style="height: 275px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Rented Cars -->
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title mb-0">Top Rented Cars</h4>
+                    </div>
+                    <div class="comment-widgets scrollable mb-2 common-widget" style="height: 300px" data-simplebar="">
+                        {% for car in top_cars %}
+                            <div class="d-flex flex-row comment-row border-bottom p-3 gap-3">
+                                <div>
+                                    <span><i class="ti ti-car fs-4"></i></span>
+                                </div>
+                                <div class="comment-text w-100">
+                                    <h6 class="fw-medium">{{ car.car_model }}</h6>
+                                    <p class="mb-1 fs-2 text-muted">Rentals: {{ car.booking_count }}</p>
+                                    <div class="comment-footer mt-2">
+                                        <div class="d-flex align-items-center">
+                                            <span class="badge bg-primary-subtle text-primary">{{ car.performance }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div class="d-flex flex-row comment-row p-3 gap-3">
+                                <div>
+                                    <span><i class="ti ti-info-circle fs-4"></i></span>
+                                </div>
+                                <div class="comment-text w-100">
+                                    <h6 class="fw-medium">No Data</h6>
+                                    <p class="mb-1 fs-2 text-muted">No cars rented yet.</p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Issues on Cars -->
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title mb-0">Issues on Cars</h4>
+                    </div>
+                    <div class="table-responsive ms-4">
+                        <table class="table mb-0 text-nowrap varient-table align-middle fs-3">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="px-0 text-muted">Car Model</th>
+                                    <th scope="col" class="px-0 text-muted">Issue</th>
+                                    <th scope="col" class="px-0 text-muted">Status</th>
+                                    <th scope="col" class="px-0 text-muted">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for issue in issues %}
+                                    <tr>
+                                        <td class="px-0">{{ issue.car.model }}</td>
+                                        <td class="px-0">{{ issue.description|truncatechars:30 }}</td>
+                                        <td class="px-0">
+                                            <span class="badge bg-{% if issue.status == 'Open' %}info{% elif issue.status == 'In Progress' %}warning{% else %}success{% endif %}-subtle text-{% if issue.status == 'Open' %}info{% elif issue.status == 'In Progress' %}warning{% else %}success{% endif %}">
+                                                {{ issue.status }}
+                                            </span>
+                                        </td>
+                                        <td class="px-0">{{ issue.created_at|date:"Y-m-d" }}</td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="4" class="px-0 text-center text-muted">No issues reported.</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+   
+<script>
+    // Pass revenue data to owner_dashboard.js
+    window.monthlyRevenue = {{ monthly_revenue|safe }};
+    window.months = {{ months|safe }};
+</script>
 {% endblock %}

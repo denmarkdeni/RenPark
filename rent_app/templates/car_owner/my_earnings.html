@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title fw-semibold mb-4">My Earnings</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Total Earnings:</strong> ₹{{ total_earnings }}</p>
+                        <p><strong>Pending Earnings:</strong> ₹{{ pending_earnings }}</p>
+                        <p><strong>Platform Fees:</strong> ₹{{ platform_fees }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Payout History:</h6>
+                        <div class="table-responsive">
+                            <table class="table mb-0 text-nowrap varient-table align-middle fs-3">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="px-0 text-muted">Booking ID</th>
+                                        <th scope="col" class="px-0 text-muted">Amount</th>
+                                        <th scope="col" class="px-0 text-muted">Status</th>
+                                        <th scope="col" class="px-0 text-muted">Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for payout in payouts %}
+                                        <tr>
+                                            <td class="px-0">{{ payout.booking.id }}</td>
+                                            <td class="px-0">₹{{ payout.amount }}</td>
+                                            <td class="px-0">
+                                                <span class="badge bg-{% if payout.status == 'Completed' %}success{% else %}warning{% endif %}-subtle text-{% if payout.status == 'Completed' %}success{% else %}warning{% endif %}">
+                                                    {{ payout.status }}
+                                                </span>
+                                            </td>
+                                            <td class="px-0">{{ payout.created_at|date:"Y-m-d" }}</td>
+                                        </tr>
+                                    {% empty %}
+                                        <tr>
+                                            <td colspan="4" class="px-0 text-center text-muted">No payouts yet.</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+{% endblock %}

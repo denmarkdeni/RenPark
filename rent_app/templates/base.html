@@ -176,8 +176,50 @@
                   </div>
                 </a>
               </li>
-
               <li class="sidebar-item">
+                <a
+                  class="sidebar-link justify-content-between"
+                  href="{% url 'car_list' %}"
+                  aria-expanded="false"
+                >
+                  <div class="d-flex align-items-center gap-3">
+                    <span class="d-flex">
+                      <i class="ti ti-car"></i>
+                    </span>
+                    <span class="hide-menu">Cars List</span>
+                  </div>
+                </a>
+              </li>
+              <li class="sidebar-item">
+                <a
+                  class="sidebar-link justify-content-between"
+                  href="{% url 'car_revenue' %}"
+                  aria-expanded="false"
+                >
+                  <div class="d-flex align-items-center gap-3">
+                    <span class="d-flex">
+                      <i class="ti ti-currency-dollar"></i>
+                    </span>
+                    <span class="hide-menu">Revenue</span>
+                  </div>
+                </a>
+              </li>
+              <li class="sidebar-item">
+                <a
+                  class="sidebar-link justify-content-between"
+                  href="{% url 'owner_payments' %}"
+                  aria-expanded="false"
+                >
+                  <div class="d-flex align-items-center gap-3">
+                    <span class="d-flex">
+                      <i class="ti ti-car"></i>
+                    </span>
+                    <span class="hide-menu">Payments</span>
+                  </div>
+                </a>
+              </li>
+
+              {% comment %} <li class="sidebar-item">
                 <a
                   class="sidebar-link justify-content-between has-arrow"
                   href="javascript:void(0)"
@@ -204,58 +246,32 @@
                     </a>
                   </li>
                   <li class="sidebar-item">
-                    <a class="sidebar-link justify-content-between" href="{% url 'car_list' %}">
+                    <a class="sidebar-link justify-content-between" href="{% url 'car_revenue' %}">
                       <div class="d-flex align-items-center gap-3">
                         <div
                           class="round-16 d-flex align-items-center justify-content-center"
                         >
                           <i class="ti ti-circle"></i>
                         </div>
-                        <span class="hide-menu">Details</span>
+                        <span class="hide-menu">Revenue</span>
                       </div>
                     </a>
                   </li>
                   <li class="sidebar-item">
-                    <a class="sidebar-link justify-content-between" href="{% url 'car_list' %}">
+                    <a class="sidebar-link justify-content-between" href="{% url 'owner_payments' %}">
                       <div class="d-flex align-items-center gap-3">
                         <div
                           class="round-16 d-flex align-items-center justify-content-center"
                         >
                           <i class="ti ti-circle"></i>
                         </div>
-                        <span class="hide-menu">List</span>
+                        <span class="hide-menu">Payments</span>
                       </div>
                     </a>
                   </li>
-                  <li class="sidebar-item">
-                    <a class="sidebar-link justify-content-between" href="{% url 'car_list' %}">
-                      <div class="d-flex align-items-center gap-3">
-                        <div
-                          class="round-16 d-flex align-items-center justify-content-center"
-                        >
-                          <i class="ti ti-circle"></i>
-                        </div>
-                        <span class="hide-menu">Checkout</span>
-                      </div>
-                    </a>
-                  </li>
+                  
                 </ul>
-              </li>
-
-              <li class="sidebar-item">
-                <a
-                  class="sidebar-link justify-content-between"
-                  href="#"
-                  aria-expanded="false"
-                >
-                  <div class="d-flex align-items-center gap-3">
-                    <span class="d-flex">
-                      <i class="ti ti-currency-dollar"></i>
-                    </span>
-                    <span class="hide-menu">Revenue</span>
-                  </div>
-                </a>
-              </li>
+              </li> {% endcomment %}
 
               {% elif user.profile.role == 'renter' %}
 
@@ -339,6 +355,20 @@
                   </div>
                 </a>
               </li>
+              <li class="sidebar-item">
+                <a
+                  class="sidebar-link justify-content-between"
+                  href="{% url 'my_earnings' %}"
+                  aria-expanded="false"
+                >
+                  <div class="d-flex align-items-center gap-3">
+                    <span class="d-flex">
+                      <i class="ti ti-currency-dollar"></i>
+                    </span>
+                    <span class="hide-menu">My Earnings</span>
+                  </div>
+                </a>
+              </li>
               <li class="nav-small-cap">
                 <iconify-icon
                   icon="solar:menu-dots-linear"
@@ -357,6 +387,34 @@
                       <i class="ti ti-car"></i>
                     </span>
                     <span class="hide-menu">Register Car</span>
+                  </div>
+                </a>
+              </li>
+              <li class="sidebar-item">
+                <a
+                  class="sidebar-link justify-content-between"
+                  href="{% url 'my_cars' %}"
+                  aria-expanded="false"
+                >
+                  <div class="d-flex align-items-center gap-3">
+                    <span class="d-flex">
+                      <i class="ti ti-steering-wheel"></i>
+                    </span>
+                    <span class="hide-menu">My Cars</span>
+                  </div>
+                </a>
+              </li>
+              <li class="sidebar-item">
+                <a
+                  class="sidebar-link justify-content-between"
+                  href="{% url 'cars_revenue_owner' %}"
+                  aria-expanded="false"
+                >
+                  <div class="d-flex align-items-center gap-3">
+                    <span class="d-flex">
+                      <i class="ti ti-currency-dollar"></i>
+                    </span>
+                    <span class="hide-menu">Revenue</span>
                   </div>
                 </a>
               </li>
@@ -492,6 +550,8 @@
     <script src="/static/dashboard/libs/apexcharts/dist/apexcharts.min.js"></script>
     <script src="/static/dashboard/libs/simplebar/dist/simplebar.js"></script>
     <script src="/static/dashboard/js/dashboard.js"></script>
+    <script src="/static/dashboard/js/owner_dashboard.js"></script>
+    <script src="/static/dashboard/js/renter_dashboard.js"></script>
     <!-- solar icons -->
     <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
   </body>
