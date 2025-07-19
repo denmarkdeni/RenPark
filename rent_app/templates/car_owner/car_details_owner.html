@@ -46,7 +46,7 @@
                         {% if documents %}
                             <ul>
                                 {% for doc in documents %}
-                                    <li>{{ doc.document_type }} - {{ doc.status }}</li>
+                                    <li>{{ doc.document_type }} - <a href="{{ doc.document_file.url }}" target="__blank__">(View file)</a></li>
                                 {% endfor %}
                             </ul>
                         {% else %}

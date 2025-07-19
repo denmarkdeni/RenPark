@@ -857,7 +857,8 @@ def my_earnings(request):
         return redirect('home')
     
     profile = request.user.profile
-    total_earnings = OwnerEarnings.objects.get(owner=profile).total_earnings
+    owner , created= OwnerEarnings.objects.get_or_create(owner=profile)
+    total_earnings = owner.total_earnings
     pending_earnings = OwnerEarnings.objects.get(owner=profile).pending_earnings
     platform_fees = OwnerEarnings.objects.get(owner=profile).platform_fees
     payouts = Payout.objects.filter(owner=profile).order_by('-created_at')

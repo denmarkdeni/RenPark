@@ -68,3 +68,22 @@ RenPark is a web-based application built using Django (Python) that simplifies t
 ```bash
 git clone https://github.com/denmarkdeni/RenPark.git
 cd RenPark
+
+```
+
+### 2. Virtual Environment
+
+- install latest python version
+- compress the project folder
+- extract and delete env folder
+- type cmd in project folder address box
+- python -m venv env  --- to install env folder
+- env\Scripts\activate  --- to activate env folder
+- pip install -r requirements.txt -- to install all packages
+- python manage.py makemigrations
+- python manage.py migrate
+- python manage.py runserver
+
+- python manage.py createsuperuser
+
+
